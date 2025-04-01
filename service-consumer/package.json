@@ -1,0 +1,17 @@
+{
+  "name": "service-consumer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "private": true,
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "kafka-node": "^5.0.0",
+    "kafkajs": "^2.2.4",
+    "mongoose": "^8.13.1"
+  }
+}

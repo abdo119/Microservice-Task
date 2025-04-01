@@ -1,0 +1,45 @@
+# deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: event-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: event-service
+  template:
+    metadata:
+      labels:
+        app: event-service
+    spec:
+      containers:
+        - name: event-service
+          image: abdelrahmn119/event-service:1.0.1
+          env:
+            - name: MONGO_URI
+              value: "mongodb+srv://abdelrahmnahmed119:C9BRr8j5wtn31ppP@cluster0.nfua0so.mongodb.net/eventdb?retryWrites=true&w=majority&appName=Cluster0"
+            - name: KAFKA_BROKERS
+              value: "kafka:9092" # Use a free Kafka service like CloudKarafka
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+---
+# service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: event-service
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 3000
+  selector:
+    app: event-service

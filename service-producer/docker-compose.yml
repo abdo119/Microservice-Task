@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+
+  mongo:
+    image: mongo:6
+    networks:
+      - event-network
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    healthcheck:
+      test: [ "CMD-SHELL", "mongosh --eval 'db.adminCommand(\"ping\")'" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - mongo-data:/data/db
+  api:
+    build: .
+    ports:
+      - "3001:3001"
+    healthcheck:
+      test: [ "CMD-SHELL",
+              "curl -s http://localhost:3000/health | grep 'UP' || exit 1"
+      ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - event-network
+    environment:
+      KAFKA_BROKERS: "kafka:9092"
+      MONGO_URI: "mongodb://root:example@mongo:27017/eventdb?authSource=admin"
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+
+volumes:
+  mongo-data:
+    driver: local
+networks:
+  event-network:
+    driver: bridge
